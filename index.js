@@ -1,8 +1,19 @@
 const express = require('express')
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const app = express()
+const cors = require('cors')
 require('dotenv').config()
+const app = express()
 const port = process.env.PORT || 5000
+
+
+app.use(cors({
+    origin: [
+        'http://localhost:5173'
+    ],
+    credentials: true
+}))
+app.use(express.json())
+
 
 
 //uri
@@ -22,10 +33,19 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-        // app.get('/api/services', (req, res) => {
-        //     res.send("get api is running")
-        // })
+        const homeCardCollection = client.db('dream-jobs').collection('homeCards')
 
+        app.get('/api/homeCards', async(req,res)=>{
+            const cursor = await homeCardCollection.find().toArray()
+            res.send(cursor)
+        })
+
+
+        app.post('/api/homeCards', async(req, res)=>{
+            const homeCard = req.body
+            const result = await homeCardCollection.insertOne(homeCard)
+            res.send(result)
+        })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
