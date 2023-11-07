@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors')
 require('dotenv').config()
 const app = express()
@@ -38,6 +38,13 @@ async function run() {
         app.get('/api/homeCards', async(req,res)=>{
             const cursor = await homeCardCollection.find().toArray()
             res.send(cursor)
+        })
+
+        app.get('/api/homeCards/:id', async(req, res)=>{
+            const id = req.params.id
+            const query = {_id: new ObjectId(id)} 
+            const result = await homeCardCollection.findOne(query)
+            res.send(result)
         })
 
 
