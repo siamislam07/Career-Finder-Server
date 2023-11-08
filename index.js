@@ -8,7 +8,9 @@ const port = process.env.PORT || 5000
 
 app.use(cors({
     origin: [
-        'http://localhost:5173'
+        'http://localhost:5173',
+        'https://a11-career-finder.web.app',
+        'https://a11-career-finder.firebaseapp.com'
     ],
     credentials: true
 }))
@@ -46,6 +48,21 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await homeCardCollection.findOne(query)
             res.send(result)
+        })
+
+        app.get('/api/applied', async (req, res) => {
+            const cursor = await appliedCollection.find().toArray()
+            res.send(cursor)
+        })
+
+        app.get('/api/users', async (req, res) => {
+            console.log(req.query.email);
+            let query = {}
+            if (req.query?.email) {
+                query = { email: req.query.email }
+            }
+            const result = await appliedCollection.find(query).toArray()
+            res.send(result);
         })
 
         app.get('/api/user', async (req, res) => {
