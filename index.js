@@ -36,31 +36,42 @@ async function run() {
         const homeCardCollection = client.db('dream-jobs').collection('homeCards')
         const appliedCollection = client.db('dream-jobs').collection('appliedPersonData')
 
-        app.get('/api/homeCards', async(req,res)=>{
+        app.get('/api/homeCards', async (req, res) => {
             const cursor = await homeCardCollection.find().toArray()
             res.send(cursor)
         })
 
-        app.get('/api/homeCards/:id', async(req, res)=>{
+        app.get('/api/homeCards/:id', async (req, res) => {
             const id = req.params.id
-            const query = {_id: new ObjectId(id)} 
+            const query = { _id: new ObjectId(id) }
             const result = await homeCardCollection.findOne(query)
             res.send(result)
         })
 
+        app.get('/api/user', async(req, res) => {
+            console.log(req.query.email);
+            let query = {}
+            if (req.query?.email) {
+                query={email: req.query.email}
+            }
+            const result = await homeCardCollection.find(query).toArray()
+            res.send(result);
+        });
+        
 
-        app.post('/api/homeCards', async(req, res)=>{
+        app.post('/api/homeCards', async (req, res) => {
             const homeCard = req.body
             const result = await homeCardCollection.insertOne(homeCard)
             res.send(result)
         })
 
-        app.post('/api/applied', async(req, res)=>{
+        app.post('/api/applied', async (req, res) => {
             const applied = req.body
             const result = await appliedCollection.insertOne(applied)
             res.send(result)
         })
 
+        
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
@@ -73,7 +84,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('Job server is running')
 })
 
 
