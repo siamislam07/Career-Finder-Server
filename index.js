@@ -48,16 +48,16 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/api/user', async(req, res) => {
+        app.get('/api/user', async (req, res) => {
             console.log(req.query.email);
             let query = {}
             if (req.query?.email) {
-                query={email: req.query.email}
+                query = { email: req.query.email }
             }
             const result = await homeCardCollection.find(query).toArray()
             res.send(result);
         });
-        
+
 
         app.post('/api/homeCards', async (req, res) => {
             const homeCard = req.body
@@ -71,7 +71,37 @@ async function run() {
             res.send(result)
         })
 
-        
+        app.put('/api/homeCards/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const updated = req.body
+            const data = {
+                $set: {
+                    title: updated.title,
+                    photoURL: updated.photoURL,
+                    email: updated.email,
+                    category: updated.category,
+                    salary: updated.salary,
+                    dates: updated.dates,
+                    description: updated.description,
+                    applicants: updated.applicants,
+                    name: updated.name,
+                    BannerUrl: updated.BannerUrl,
+                    experienceLevel: updated.experienceLevel,
+                    companyLocation: updated.companyLocation
+                }
+            }
+            const result = await homeCardCollection.updateOne(filter, data, options )
+            res.send(result)
+        })
+
+        app.delete('/api/homeCards/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await homeCardCollection.deleteOne(query)
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
